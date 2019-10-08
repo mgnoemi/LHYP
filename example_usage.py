@@ -6,8 +6,8 @@ from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
 
 
-image_folder = '/media/adambudai/Storage/heartdata/hypertrophy/cleanready/10635813AMR806/sa/images'
-con_file = '/media/adambudai/Storage/heartdata/hypertrophy/cleanready/10635813AMR806/sa/contours.con'
+image_folder = r'C:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\sa\images'
+con_file = r'C:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\sa\contours.con'
 
 # reading the dicom files
 dr = DCMreaderVM(image_folder)
@@ -15,6 +15,8 @@ dr = DCMreaderVM(image_folder)
 # reading the contours
 cr = CONreaderVM(con_file)
 contours = cr.get_hierarchical_contours()
+
+print('Hello World')
 
 # drawing the contours for the images
 for slc in contours:
