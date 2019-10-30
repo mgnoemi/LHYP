@@ -30,8 +30,9 @@ for slc in contours:
                 rgb = [1, 0, 0]
             elif mode == 'lp':
                 rgb = [0, 1, 0]
-            elif mode == 'rn':
-                rgb = [1, 1, 0]
+            #This is the right chamber 
+            #elif mode == 'rn':
+            #    rgb = [1, 1, 0]
             else:
                 rgb = None
             if rgb is not None:

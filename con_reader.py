@@ -89,10 +89,10 @@ class CONreaderVM:
         line = find_xycontour_tag()
         while line.find(stop_tag) == -1 and line != "":
 
-            slice, frame, mode = identify_slice_frame_mode()
+            slice, frame, mode, volume = identify_slice_frame_mode_volume()
             num = number_of_contour_points()
             contour = read_contour_points(num)
-            self.container.append((slice, frame, mode, contour))
+            self.container.append((slice, frame, mode, contour, volume))
             line = find_xycontour_tag()
 
         con.close()
@@ -108,6 +108,7 @@ class CONreaderVM:
                 frame = item[1]   # frame in a hearth cycle
                 mode = item[2]    # mode can be red, green, yellow
                 contour = item[3]
+                volume = item[4]
 
                 # rearrange the contour
                 d = {'x': [], 'y': []}
@@ -128,7 +129,7 @@ class CONreaderVM:
                     contour_mtx = np.zeros((N, 2))
                     contour_mtx[:, 0] = np.array(x)
                     contour_mtx[:, 1] = np.array(y)
-                    self.contours[slice][frame][mode] = contour_mtx
+                    self.contours[slice][frame][mode][volume] = contour_mtx
 
         return self.contours
 
@@ -142,12 +143,14 @@ class CONreaderVM:
                     mode_level_cp = mode_level
                 yield slice, frame, mode_level_cp
 
+#Patient data can read from this 
     def get_volume_data(self):
         # process field of view
         fw_string = self.volume_data['Field_of_view=']
         sizexsize_mm = fw_string.split('x')  # variable name shows the format
         size_h = float(sizexsize_mm[0])
         size_w = float(sizexsize_mm[1].split(' mm')[0])  # I cut the _mm ending
+        self.contours[slice][frame][mode][volume] = fw_string
 
         # process image resolution
         img_res_string = self.volume_data['Image_resolution=']
