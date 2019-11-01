@@ -1,6 +1,6 @@
 # Reads the sa folder wiht dicom files and contours
 # then draws the contours on the images.
-
+import math
 from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
@@ -22,20 +22,17 @@ for slc in contours:
         image = dr.get_image(slc, frm)  # numpy array
         #cntrs = []
         rgbs = []
-        #print ("slice: "+str(slc)+" frame: "+str(frm))
-        patientdict.update ({"slice":slc})
-        patientdict.update ({"frame":frm})
-        greensize=0
-        redsize=0
-        if slc not in patientdict:
-            patientdict[slc] = {}
-        if frm not in patientdict[slc]:
-            patientdict[slc][frm] = {}
-
-        patientdict[slc][frm]['green'] = 213
-        patientdict[slc][frm]['red'] = 213
-
         
+        greenlength=0.0
+        redlength=0.0
+        ratio=0.0
+
+        if slc not in patientdict:
+            if (abs(frm-9) > abs(frm-24)) or frm==0:
+                patientdict[slc] = {}
+                if frm not in patientdict[slc]:
+                    patientdict[slc][frm] = {}
+       
         for mode in contours[slc][frm]: #modif to the cycle not start for 'rn'
             # choose color
             cntrs = []
@@ -48,27 +45,28 @@ for slc in contours:
             if rgb is not None:
                 cntrs.append(contours[slc][frm][mode])
                 rgbs.append(rgb)
-            # calculate contour size
-            print(cntrs[0])
+            # calculate contour length
             if mode == 'lp':
                 if cntrs:
                     for i in range(len(cntrs[0])):
-                        greensize=greensize+1
-                    #print ("greensize: "+str(greensize))
-                    patientdict.update ({"greensize":greensize})
-            
+                        greenlength=greenlength+math.sqrt(((cntrs[0][i][0]-cntrs[0][i-1][0])**2)+((cntrs[0][i][1]-cntrs[0][i-1][1])**2))
             if mode == 'ln':
                 if cntrs:
                     for i in range(len(cntrs[0])):
-                        redsize=redsize+1
-                    #print ("redsize: "+str(redsize))
-                    patientdict.update({"redsize":redsize})
-        #print (greensize, redsize)
-        if greensize!=0 and redsize!=0:
-            ratio = greensize / redsize
-            patientdict.update({"ratio":ratio})
-        #print(patientdict)
-        patientdict.clear()
+                        redlength=redlength+math.sqrt(((cntrs[0][i][0]-cntrs[0][i-1][0])**2)+((cntrs[0][i][1]-cntrs[0][i-1][1])**2))
+            if greenlength!=0 and redlength!=0:
+                if 'green' not in patientdict[slc][frm]:
+                    patientdict[slc][frm]['green']=greenlength
+                if 'red' not in patientdict[slc][frm]:
+                    patientdict[slc][frm]['red']=redlength
+
+        if greenlength!=0 and redlength!=0:
+            ratio = greenlength / redlength
+            patientdict[slc][frm]['ratio']=ratio
+        else:
+            ratio=0.0
+
+print(patientdict)
 
         #if len(cntrs) > 0:
         #    draw(image, cntrs, rgbs)
