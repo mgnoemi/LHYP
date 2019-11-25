@@ -149,7 +149,6 @@ class CONreaderVM:
         sizexsize_mm = fw_string.split('x')  # variable name shows the format
         size_h = float(sizexsize_mm[0])
         size_w = float(sizexsize_mm[1].split(' mm')[0])  # I cut the _mm ending
-        self.contours[slice][frame][mode] = fw_string
 
         # process image resolution
         img_res_string = self.volume_data['Image_resolution=']
