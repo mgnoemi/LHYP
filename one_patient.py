@@ -1,26 +1,35 @@
 # Reads the sa folder wiht dicom files and contours
 # then draws the contours on the images.
 import math
+import pickle
+import os
 from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
 
-
-image_folder = r'C:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\sa\images'
-con_file = r'C:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\sa\contours.con'
-
-# reading the dicom files
-dr = DCMreaderVM(image_folder)
+con_file = r'D:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\sa\contours.con'
+meta_file = r'D:\Egyetem\MSC\2.félév\Projektfeladat\10635813AMR806\meta.txt'
 
 # reading the contours
 cr = CONreaderVM(con_file)
 contours = cr.get_hierarchical_contours()
 patientdict=dict()
+
+#create pickle file
+FileName='Patient.pickle'
+pickle_out = open(FileName,'wb')
+metafile = open(meta_file,"r") #open metafile
+pickle.dump((metafile.read(),contours),pickle_out) #fill up pickle
+pickle_out.close()    #close pickle
+
+pickle_in = open("Patient.pickle","rb")
+patient = pickle.load(pickle_in) #run out of input
+print(patient)
+
+
 # drawing the contours for the images
 for slc in contours:
     for frm in contours[slc]:
-        image = dr.get_image(slc, frm)  # numpy array
-        #cntrs = []
 
         lpLenght=0.0
         lnLenght=0.0
@@ -112,10 +121,7 @@ for slc in contours:
             ratioLenght=0.0
             ratioArea=0.0
             #mindent nullázni
-            
-
-
 
         # if len(cntrs) > 0:
         #    draw(image, cntrs, [1, 1, 1])
-print(patientdict)
+#print(patientdict)
