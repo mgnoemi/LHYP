@@ -1,41 +1,11 @@
 # Reads the sa folder wiht dicom files and contours
 # then draws the contours on the images.
 import math
-import pickle
 import os
+import Make_pickle
 from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
-
-patientPath = r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data'
-PatientID = []
-files = os.listdir(patientPath)
-for ID in files:
-    PatientID.append(ID)
-
-# reading the contours
-validID = []
-
-for i in range(len(PatientID)):
-    ID=PatientID[i]
-
-    con_file = os.path.join(r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data',ID,'sa\contours.con')
-    meta_file = os.path.join(r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data',ID,'meta.txt')
-
-    try:
-        cr = CONreaderVM(con_file)
-        contours = cr.get_hierarchical_contours()
-        patientdict=dict()
-        #reading the metafile
-        metafile = open(meta_file,"r") #open metafile
-        FileName='Patient_'+ID+'.pickle' #create pickle file
-        with open(FileName, 'wb') as pck:
-            pickle.dump((metafile.read(),contours),pck) #fill up pickle
-            pck.close()    #close pickle
-        validID.append(ID)
-
-    except:
-        print('an error occoured while try to access patient data with the ID: ' + ID)
 
 for x in range(len(validID)):
     pickle_in = open('Patient_'+validID[x]+'.pickle',"rb")
