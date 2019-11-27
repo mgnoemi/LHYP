@@ -2,6 +2,7 @@
 # then draws the contours on the images.
 import math
 import os
+import pickle
 import Make_pickle
 from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM

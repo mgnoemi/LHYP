@@ -1,5 +1,7 @@
 
 import pickle
+import os
+from con_reader import CONreaderVM
 
 patientPath = r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data'
 PatientID = []
@@ -13,8 +15,8 @@ validID = []
 for i in range(len(PatientID)):
     ID=PatientID[i]
 
-    con_file = os.path.join(r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data',ID,'sa\contours.con')
-    meta_file = os.path.join(r'D:\Egyetem\MSC\2.félév\Projektfeladat\Patient_data',ID,'meta.txt')
+    con_file = os.path.join(patientPath,ID,'sa\contours.con')
+    meta_file = os.path.join(patientPath,ID,'meta.txt')
 
     try:
         cr = CONreaderVM(con_file)
