@@ -3,13 +3,23 @@
 import math
 import os
 import pickle
-import Make_pickle
+#import Make_pickle
 from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
+import numpy as np
 
-for x in range(len(validID)):
-    pickle_in = open('Patient_'+validID[x]+'.pickle',"rb")
+picklePath = r'C:\Repoz\LHYP'
+PickleList = []
+files = os.listdir(picklePath)
+for FileName in files:
+    if FileName.endswith(".pickle"):
+        PickleList.append(FileName)
+
+patientdict=dict()
+
+for x in range(len(PickleList)):
+    pickle_in = open(PickleList[x],"rb")
     patient = pickle.load(pickle_in) #run out of input
     metadata = patient[0]
     contours = patient [1]
@@ -82,6 +92,13 @@ for x in range(len(validID)):
                                 if lnHausdorffMin > lnHausdorffMax:
                                     lnHausdorffMax=lnHausdorffMin
                             lnHausdorff=0.0
+                            #calculate ellipse
+                            X = cntrs[0][0][0]
+                            Y = cntrs[0][0][1]
+                            A = np.hstack([X**2, X * Y, Y**2, X, Y])
+                            b = np.ones_like(X)
+                            x = np.linalg.lstsq(A, b)[0].squeeze()
+
 
                 Hausdorff=max(lnHausdorffMax, lpHausdorffMax)
                         
@@ -111,6 +128,6 @@ for x in range(len(validID)):
 
             # if len(cntrs) > 0:
             #    draw(image, cntrs, [1, 1, 1])
-    print('patient data created for patient with ID:' + validID[x])
+    print('patient data created from file:' + PickleList[x])
 
 print('finished')
