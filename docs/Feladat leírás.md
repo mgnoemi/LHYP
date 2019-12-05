@@ -1,6 +1,9 @@
+#Hypertrófia
+
+##Bevezetés
 A mélytanulás az elmúlt időben nagy figyelemnek örvend, kimagasló eredményeket ér el az orvostudományban is. A mélytanulási algoritmusok nagyon jók a különféle képalkotó diagnosztikai berendezések (MRI, CT) által létrehozott, vizuális információt tartalmazó leletek kiértékelésében.
   
-Mi volt a projekt? 
+##Mi volt a projekt? 
 A projekt a Városmajori Szív- és Érgyógyászati Klinika és a BME együtműködésében született meg, célja olyan mélytanuló algoritmuson alapuló szoftver megalkotása, ami a szívről készített MRI felvételek alapján segít felismerni a balkamrai hypertrófiát, azaz a balkamra falának kóros asszimetriáját, megvastagodását.  Jelenleg nincs ezt az elváltozást vizsgáló automatikus folyamat, szűrése minden esetben időigényes, és szakmai hozzáértő személyt igényel. A program szerepe a döntéstámogatás, így jelentősen felgyorsítja a kiértékelés folyamatát. A projekt számára a klinika 5400 páciens adatait bocsájtotta rendelkezésre, ami az ebben a témában korábban megvalósult kutatásokban alkalmazott adathalmaznál jóval nagyobb.
 
 A projekt keretein belül két fő irányvonal szerint indult meg a kutatás:
