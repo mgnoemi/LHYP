@@ -8,6 +8,25 @@ from con_reader import CONreaderVM
 from dicom_reader import DCMreaderVM
 from con2img import draw_contourmtcs2image as draw
 import numpy as np
+from numpy.linalg import eig, inv
+
+def fitEllipse(x,y):
+    x = x[:,np.newaxis]
+    y = y[:,np.newaxis]
+    D =  np.hstack((x*x, x*y, y*y, x, y, np.ones_like(x)))
+    S = np.dot(D.T,D)
+    C = np.zeros([6,6])
+    C[0,2] = C[2,0] = 2; C[1,1] = -1
+    E, V =  eig(np.dot(inv(S), C))
+    n = np.argmax(np.abs(E))
+    a = V[:,n]
+    b,c,d,f,g,a = a[1]/2, a[2], a[3]/2, a[4]/2, a[5], a[0]
+    up = 2*(a*f*f+c*d*d+g*b*b-2*b*d*f-a*c*g)
+    down1=(b*b-a*c)*( (c-a)*np.sqrt(1+4*b*b/((a-c)*(a-c)))-(c+a))
+    down2=(b*b-a*c)*( (a-c)*np.sqrt(1+4*b*b/((a-c)*(a-c)))-(c+a))
+    axis1=np.sqrt(up/down1)
+    axis2=np.sqrt(up/down2)
+    return axis1, axis2
 
 picklePath = r'C:\Repoz\LHYP'
 PickleList = []
@@ -23,7 +42,6 @@ for x in range(len(PickleList)):
     patient = pickle.load(pickle_in) #run out of input
     metadata = patient[0]
     contours = patient [1]
-
     # drawing the contours for the images
     for slc in contours:
         for frm in contours[slc]:
@@ -71,6 +89,12 @@ for x in range(len(PickleList)):
                                 if lpHausdorffMin > lpHausdorffMax:
                                     lpHausdorffMax=lpHausdorffMin
                             lpHausdorff=0.0
+                            #calculate ellipse
+                            X = cntrs[0][:, 0]
+                            Y = cntrs[0][:, 1]
+                            ellipseResult = fitEllipse(X, Y)
+                            lpMajorAxis = ellipseResult[0]
+                            lpMinorAxis = ellipseResult[1]
 
                 #Calculations ln mode
                 if mode == 'ln':
@@ -93,18 +117,22 @@ for x in range(len(PickleList)):
                                     lnHausdorffMax=lnHausdorffMin
                             lnHausdorff=0.0
                             #calculate ellipse
-                            X = cntrs[0][0][0]
-                            Y = cntrs[0][0][1]
-                            A = np.hstack([X**2, X * Y, Y**2, X, Y])
-                            b = np.ones_like(X)
-                            x = np.linalg.lstsq(A, b)[0].squeeze()
-
-
+                            X = cntrs[0][:, 0]
+                            Y = cntrs[0][:, 1]
+                            ellipseResult = fitEllipse(X, Y)
+                            lnMajorAxis = ellipseResult[0]
+                            lnMinorAxis = ellipseResult[1]
+                            
                 Hausdorff=max(lnHausdorffMax, lpHausdorffMax)
                         
                 if lpLenght!=0 and lnLenght!=0: #fill up dictionary
                     if slc not in patientdict:
                         if (abs(frm-9) > abs(frm-24)) or frm==0:
+                            ratioLenght = lpLenght / lnLenght
+                            ratioArea = lpArea / lnArea
+                            majorAxisRatio = lpMajorAxis / lnMajorAxis
+                            minorAxisRatio = lpMinorAxis / lnMinorAxis
+
                             patientdict[slc] = {}
                             if frm not in patientdict[slc]:
                                 patientdict[slc][frm] = {}
@@ -112,22 +140,30 @@ for x in range(len(PickleList)):
                                 patientdict[slc][frm]['lpLenght']=lpLenght
                             if 'lnLenght' not in patientdict[slc][frm]:
                                 patientdict[slc][frm]['lnLenght']=lnLenght
-                            ratioLenght = lpLenght / lnLenght
-                            patientdict[slc][frm]['ratioLenght']=ratioLenght
+                            if 'ratioLenght' not in patientdict[slc][frm]:
+                                patientdict[slc][frm]['ratioLenght']=ratioLenght
+
                             if 'lpArea' not in patientdict[slc][frm]:
                                 patientdict[slc][frm]['lpArea']=lpArea
                             if 'lnArea' not in patientdict[slc][frm]:
                                 patientdict[slc][frm]['lnArea']=lnArea
-                            ratioArea = lpArea / lnArea
-                            patientdict[slc][frm]['ratioArea']=ratioArea
+                            if 'ratioArea' not in patientdict[slc][frm]:
+                                patientdict[slc][frm]['ratioArea']=ratioArea
+
                             if 'HausdorffDistance' not in patientdict[slc][frm]:
                                 patientdict[slc][frm]['HausdorffDistance']=Hausdorff
+
+                            if 'MinorAxisRatio' not in patientdict[slc][frm]:
+                                patientdict[slc][frm]['MinorAxisRatio']=minorAxisRatio
+                            if 'MajorAxisRatio' not in patientdict[slc][frm]:
+                                patientdict[slc][frm]['MajorAxisRatio']=majorAxisRatio
+
+                #mindent nullázni
                 ratioLenght=0.0
                 ratioArea=0.0
-                #mindent nullázni
+                majorAxisRatio=0.0
+                minorAxisRatio=0.0
 
-            # if len(cntrs) > 0:
-            #    draw(image, cntrs, [1, 1, 1])
-    print('patient data created from file:' + PickleList[x])
+    
 
 print('finished')
