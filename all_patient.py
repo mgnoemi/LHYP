@@ -41,7 +41,10 @@ for x in range(len(PickleList)):
     pickle_in = open(PickleList[x],"rb")
     patient = pickle.load(pickle_in) #run out of input
     metadata = patient[0]
+    print (metadata[11:])
     contours = patient [1]
+    patientID = PickleList[x][8:-7]
+
     # drawing the contours for the images
     for slc in contours:
         for frm in contours[slc]:
@@ -126,44 +129,49 @@ for x in range(len(PickleList)):
                 Hausdorff=max(lnHausdorffMax, lpHausdorffMax)
                         
                 if lpLenght!=0 and lnLenght!=0: #fill up dictionary
-                    if slc not in patientdict:
+                    patology = metadata[11:]
+                    if patology not in patientdict:
+                        patientdict[patology] = {}
+                    if patientID not in patientdict[patology]:
+                        patientdict[patology][patientID] = {}
+                    if slc not in patientdict[patology][patientID]:
                         if (abs(frm-9) > abs(frm-24)) or frm==0:
                             ratioLenght = lpLenght / lnLenght
                             ratioArea = lpArea / lnArea
                             majorAxisRatio = lpMajorAxis / lnMajorAxis
                             minorAxisRatio = lpMinorAxis / lnMinorAxis
 
-                            patientdict[slc] = {}
-                            if frm not in patientdict[slc]:
-                                patientdict[slc][frm] = {}
-                            if 'lpLenght' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['lpLenght']=lpLenght
-                            if 'lnLenght' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['lnLenght']=lnLenght
-                            if 'ratioLenght' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['ratioLenght']=ratioLenght
+                            patientdict[patology][patientID][slc] = {}
+                            if frm not in patientdict[patology][patientID][slc]:
+                                patientdict[patology][patientID][slc][frm] = {}
+                            if 'lpLenght' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['lpLenght']=lpLenght
+                            if 'lnLenght' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['lnLenght']=lnLenght
+                            if 'ratioLenght' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['ratioLenght']=ratioLenght
 
-                            if 'lpArea' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['lpArea']=lpArea
-                            if 'lnArea' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['lnArea']=lnArea
-                            if 'ratioArea' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['ratioArea']=ratioArea
+                            if 'lpArea' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['lpArea']=lpArea
+                            if 'lnArea' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['lnArea']=lnArea
+                            if 'ratioArea' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['ratioArea']=ratioArea
 
-                            if 'HausdorffDistance' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['HausdorffDistance']=Hausdorff
+                            if 'HausdorffDistance' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['HausdorffDistance']=Hausdorff
 
-                            if 'MinorAxisRatio' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['MinorAxisRatio']=minorAxisRatio
-                            if 'MajorAxisRatio' not in patientdict[slc][frm]:
-                                patientdict[slc][frm]['MajorAxisRatio']=majorAxisRatio
-
+                            if 'MinorAxisRatio' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['MinorAxisRatio']=minorAxisRatio
+                            if 'MajorAxisRatio' not in patientdict[patology][patientID][slc][frm]:
+                                patientdict[patology][patientID][slc][frm]['MajorAxisRatio']=majorAxisRatio
+                            f = open("patientdict.txt","w")
+                            f.write( str(patientdict) )
+                            f.close()
                 #mindent nullázni
                 ratioLenght=0.0
                 ratioArea=0.0
                 majorAxisRatio=0.0
                 minorAxisRatio=0.0
-
-    
 
 print('finished')
