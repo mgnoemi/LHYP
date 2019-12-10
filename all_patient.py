@@ -128,8 +128,8 @@ for x in range(len(PickleList)):
                             
                 Hausdorff=max(lnHausdorffMax, lpHausdorffMax)
                         
-                if lpLenght!=0 and lnLenght!=0: #fill up dictionary
-                    patology = metadata[11:]
+                if lpLenght!=0 and lnLenght!=0 and lnMajorAxis!=0 and lpMajorAxis!=0 and lnMinorAxis!=0 and lpMinorAxis!=0: #fill up dictionary
+                    patology = metadata[11:-2]
                     if patology not in patientdict:
                         patientdict[patology] = {}
                     if patientID not in patientdict[patology]:
@@ -143,7 +143,7 @@ for x in range(len(PickleList)):
 
                             patientdict[patology][patientID][slc] = {}
                             if frm not in patientdict[patology][patientID][slc]:
-                                patientdict[patology][patientID][slc][frm] = {}
+                                patientdict[patology][patientID][slc][frm] ={}
                             if 'lpLenght' not in patientdict[patology][patientID][slc][frm]:
                                 patientdict[patology][patientID][slc][frm]['lpLenght']=lpLenght
                             if 'lnLenght' not in patientdict[patology][patientID][slc][frm]:
@@ -173,5 +173,7 @@ for x in range(len(PickleList)):
                 ratioArea=0.0
                 majorAxisRatio=0.0
                 minorAxisRatio=0.0
-
+with open('allPatientData', 'wb') as pck:
+    pickle.dump(patientdict,pck) #fill up pickle
+    pck.close()    #close pickle
 print('finished')

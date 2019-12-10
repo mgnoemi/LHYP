@@ -12,7 +12,9 @@ for ID in files:
 # reading the contours
 validID = []
 
-for i in range(len(PatientID)):
+for i in range(len(PatientID)):with open(FileName, 'wb') as pck:
+            pickle.dump((metafile.read(),contours),pck) #fill up pickle
+            pck.close()    #close pickle
     ID=PatientID[i]
 
     con_file = os.path.join(patientPath,ID,'sa\contours.con')
